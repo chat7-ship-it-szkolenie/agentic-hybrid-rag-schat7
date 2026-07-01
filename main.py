@@ -1,9 +1,9 @@
 from langchain_core.messages import HumanMessage
-from src.core.nodes import generate_query_or_respond
+from src.core.graph import graph
 
 def main():
-   state = {"messages": [HumanMessage(content="Cześć, jak się masz?")]}
-   result = generate_query_or_respond(state)
+   state = {"messages": [HumanMessage(content="Czy Sages ma szkolenie z Dockera?")]}
+   result = graph.invoke(state)
    print(result["messages"][-1].content)
 
 if __name__ == "__main__":
