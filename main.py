@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from src.core.graph import graph
 
 def main():
-   state = {"messages": [HumanMessage(content="Czy Sages ma szkolenie z Dockera?")]}
+   state = {"messages": [HumanMessage(content="Czy macie szkolenie z Dockera dla początkujących analityków danych?")]}
    result = graph.invoke(state)
    print(result["messages"][-1].content)
 

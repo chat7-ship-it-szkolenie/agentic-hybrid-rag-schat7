@@ -1,8 +1,8 @@
 from langchain_core.tools import create_retriever_tool
 
-from core.retriever import get_retriever
+from core.hybrid_retriever import get_hybrid_retriever
 
-retriever = get_retriever()
+retriever = get_hybrid_retriever()
 retriever_tool = create_retriever_tool(
     retriever,
     "search_sages_trainings",
