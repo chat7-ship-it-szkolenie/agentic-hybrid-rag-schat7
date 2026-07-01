@@ -1,2 +1,13 @@
+gdown
+pyarrow
 langchain
-langraph
+langchain-chroma
+langchain-openai
+langchain-core
+langchain-text-splitters
+langchain-community
+rank-bm25
+langgraph
+pydantic-settings
+langsmith
+python-dotenv
