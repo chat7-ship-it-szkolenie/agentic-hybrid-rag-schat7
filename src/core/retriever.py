@@ -20,4 +20,4 @@ def get_retriever():
         embedding_function=embeddings,
         persist_directory=CHROMA_DIR,
     )
-    return vs.as_retriever()
+    return vs.as_retriever(k=4)
