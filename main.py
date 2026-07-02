@@ -5,7 +5,7 @@ from langgraph.errors import GraphRecursionError
 
 from src.core.graph import graph
 
-RECURSION_LIMIT = 5
+RECURSION_LIMIT = 15
 
 
 def main():

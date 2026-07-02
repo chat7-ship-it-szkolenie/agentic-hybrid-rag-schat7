@@ -35,3 +35,12 @@ HANDOFF_PROMPT = (
     "Jeśli pytanie dotyczy konkretnych szkoleń, technologii, programu, terminów lub czegokolwiek, "
     "czego nie ma w bazie FAQ, zwróć route='rag'."
 )
+
+KEYWORD_PROMPT = (
+    "Wypisz z pytania użytkownika same słowa lub frazy kluczowe do wyszukania w indeksie szkoleń "
+    "(technologia, framework, temat).\n"
+    "Nie dodawaj żadnych założeń, których nie ma wprost w pytaniu (np. rola zawodowa, poziom "
+    "zaawansowania, czas trwania, format szkolenia) — jeśli ich tam nie ma, pomiń je.\n"
+    "Zwróć tylko słowa kluczowe oddzielone spacjami, bez pełnych zdań i bez dodatkowego tekstu.\n"
+    "Pytanie:\n-------\n{question}\n-------\n"
+)

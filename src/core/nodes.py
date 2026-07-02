@@ -7,9 +7,9 @@ from langgraph.graph import END, MessagesState
 from langgraph.types import Command
 
 from core.models import grader_model, response_model
-from core.prompts import GENERATE_PROMPT, REWRITE_PROMPT, GRADE_PROMPT, HANDOFF_PROMPT
+from core.prompts import GENERATE_PROMPT, REWRITE_PROMPT, GRADE_PROMPT, HANDOFF_PROMPT, KEYWORD_PROMPT
 from core.validation import GradeDocuments, RouteDecision, TrainingAnswer
-from core.tools import retriever_tool
+from core.tools import retriever_tool, search_faiss
 from core.faq import FAQ_DATABASE
 from core.utils import _current_question
 
@@ -59,19 +59,46 @@ def generate_answer(state: MessagesState):
     trainings = [t.model_dump() for t in structured.trainings]
     return {"messages": [AIMessage(content=content, additional_kwargs={"trainings": trainings})]}
 
-
-def grade_documents(state: MessagesState) -> Literal["generate_answer", "rewrite_question"]:
-    """Sprawdza, czy zwrócone fragmenty dokumentacji są istotne."""
-    question = _current_question(state)
-    context = state["messages"][-1].content
+def _grade(question: str, context: str) -> str:
     prompt = GRADE_PROMPT.format(question=question, context=context)
     response = grader_model.with_structured_output(GradeDocuments).invoke(
         [{"role": "user", "content": prompt}]
     )
-    score = response.binary_score.strip().lower()
-    print(f"  [workflow] grader → {score}")
-    return "generate_answer" if score == "yes" else "rewrite_question"
+    return response.binary_score.strip().lower()
 
+def grade_documents(state: MessagesState) -> Literal["generate_answer", "retrieve_faiss"]:
+    """Sprawdza, czy zwrócone fragmenty dokumentacji są istotne."""
+    question = _current_question(state)
+    context = state["messages"][-1].content
+    score = _grade(question, context)
+    print(f"  [workflow] grader → {score}")
+    return "generate_answer" if score == "yes" else "retrieve_faiss"
+
+
+def _extract_keywords(question: str) -> str:
+    """Słowa kluczowe (technologia/framework/temat) zamiast pełnego zdania — FAISS (BM25 + mały
+    model dense) trafia lepiej w konkret niż w rozbudowane, przeformułowane pytanie."""
+    prompt = KEYWORD_PROMPT.format(question=question)
+    response = grader_model.invoke([{"role": "user", "content": prompt}])
+    return response.content.strip()
+
+def retrieve_faiss(state: MessagesState):
+    """Handoff: Chroma nie znalazła trafnego kontekstu — spróbuj lokalnego indeksu FAISS (open-source, bez klucza OpenAI).
+    Zapytanie ograniczone do słów kluczowych, bez rewrite'u całego pytania."""
+    question = _current_question(state)
+    keywords = _extract_keywords(question)
+    print(f"  [workflow] → handoff: retrieve_faiss (lokalny indeks, HF embeddings) | słowa kluczowe: {keywords}")
+    result = search_faiss.invoke({"query": keywords})
+    return {"messages": [AIMessage(content=result)]}
+
+
+def grade_faiss_documents(state: MessagesState) -> Literal["generate_answer", "rewrite_question"]:
+    """Ocenia kontekst z FAISS. To już ostatnia deska ratunku przed przeformułowaniem pytania."""
+    question = _current_question(state)
+    context = state["messages"][-1].content
+    score = _grade(question, context)
+    print(f"  [workflow] grader (faiss) → {score}")
+    return "generate_answer" if score == "yes" else "rewrite_question"
 
 def rewrite_question(state: MessagesState):
     question = _current_question(state)
