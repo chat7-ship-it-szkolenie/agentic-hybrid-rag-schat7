@@ -9,8 +9,7 @@ response_model = ChatOpenAI(
     api_key=settings.openai_api_key,
 )
 grader_model = ChatOpenAI(
-    model="~anthropic/claude-haiku-latest",
+    model="gpt-4o",
     temperature=0.0,
-    base_url=settings.openrouter_base_url,
-    api_key=settings.openrouter_api_key,
+    api_key=settings.openai_api_key,
 )
