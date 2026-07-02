@@ -8,7 +8,7 @@ from langgraph.types import Command
 
 from core.models import grader_model, response_model
 from core.prompts import GENERATE_PROMPT, REWRITE_PROMPT, GRADE_PROMPT, HANDOFF_PROMPT
-from core.validation import GradeDocuments, RouteDecision
+from core.validation import GradeDocuments, RouteDecision, TrainingAnswer
 from core.tools import retriever_tool
 from core.faq import FAQ_DATABASE
 
@@ -46,13 +46,16 @@ def generate_query_or_respond(state: MessagesState):
 
 
 def generate_answer(state: MessagesState):
-    """Generuje finalną odpowiedź na podstawie dokumentów zwróconych przez retriever."""
     question = state["messages"][0].content
     context = state["messages"][-1].content
     prompt = GENERATE_PROMPT.format(question=question, context=context)
-    response = response_model.invoke([HumanMessage(content=prompt)])
-    print(f"  [workflow] → odpowiedź z RAG: {response.content[:120]}")
-    return {"messages": [response]}
+    structured = response_model.with_structured_output(TrainingAnswer).invoke(
+        [{"role": "user", "content": prompt}]
+    )
+    content = structured.model_dump_json()
+    print(f"  [workflow] odpowiedź: {content[:20]}")
+    trainings = [t.model_dump() for t in structured.trainings]
+    return {"messages": [AIMessage(content=content, additional_kwargs={"trainings": trainings})]}
 
 
 def grade_documents(state: MessagesState) -> Literal["generate_answer", "rewrite_question"]:

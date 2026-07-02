@@ -16,3 +16,20 @@ class RouteDecision(BaseModel):
         default=None,
         description="Dokładna treść pytania z bazy FAQ, które odpowiada pytaniu użytkownika (tylko gdy route='faq')",
     )
+
+class TrainingRecommendation(BaseModel):
+    title: str = Field(description="Nazwa polecanego szkolenia")
+    link: str = Field(description="Link do programu szkolenia (pdf_url z kontekstu)")
+
+class TrainingAnswer(BaseModel):
+    answer: str = Field(
+        description=(
+            "Odpowiedź dla użytkownika po polsku, maksymalnie 4 zdania. "
+            "Nie umieszczaj w niej adresów URL ani linków w formacie markdown — "
+            "linki znajdują się wyłącznie w polu 'trainings'."
+        )
+    )
+    trainings: list[TrainingRecommendation] = Field(
+        default_factory=list,
+        description="Lista pasujących szkoleń wraz z linkami do programów.",
+    )
