@@ -11,3 +11,6 @@ langgraph
 pydantic-settings
 langsmith
 python-dotenv
+langchain-huggingface
+sentence-transformers
+faiss-cpu==1.10.0
