@@ -1,5 +1,4 @@
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, Field
 
 from config import settings
 
