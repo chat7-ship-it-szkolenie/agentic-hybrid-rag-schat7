@@ -13,7 +13,7 @@ def main():
         "configurable": {"thread_id": str(uuid.uuid4())},
         "recursion_limit": RECURSION_LIMIT,
     }
-    print("Asystent Sages. Wpisz 'exit' albo 'quit', żeby zakończyć.\n")
+    print("Asystent Sages. Wpisz 'exit' albo 'quit',  żeby zakończyć.\n")
 
     while True:
         question = input("Ty: ").strip()
