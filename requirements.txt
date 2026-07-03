@@ -13,6 +13,6 @@ langsmith
 python-dotenv
 langchain-huggingface
 sentence-transformers
-faiss-cpu==1.10.0
+faiss-cpu
 fastapi
 uvicorn
