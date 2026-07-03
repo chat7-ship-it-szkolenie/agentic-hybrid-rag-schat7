@@ -9,17 +9,6 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.tools import create_retriever_tool
 
 
-_chroma_dir = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "data",
-    "indexes",
-    "chroma",
-)
-if not os.path.isdir(_chroma_dir) or not os.listdir(_chroma_dir):
-    import core.retriever
-
-    core.retriever.get_retriever = lambda: MagicMock(spec=BaseRetriever)
-
 DOCUMENT_PROMPT = PromptTemplate.from_template(
     "{page_content}\nLink do programu szkolenia: {pdf_url}"
 )
@@ -32,6 +21,22 @@ class FakeRetriever(BaseRetriever):
 
     def _get_relevant_documents(self, query: str) -> list[Document]:
         return self.docs
+
+
+_chroma_dir = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data",
+    "indexes",
+    "chroma",
+)
+if not os.path.isdir(_chroma_dir) or not os.listdir(_chroma_dir):
+    import core.retriever
+    import core.hybrid_retriever
+
+    core.retriever.get_retriever = lambda: MagicMock(spec=BaseRetriever)
+    core.hybrid_retriever.get_hybrid_retriever = lambda *args, **kwargs: FakeRetriever(
+        docs=[]
+    )
 
 
 @pytest.fixture
