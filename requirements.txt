@@ -16,3 +16,4 @@ sentence-transformers
 faiss-cpu==1.10.0
 fastapi
 uvicorn
+pytest

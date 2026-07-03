@@ -23,4 +23,4 @@ jobs:
         run: pip install ruff 
 
       - name: ruff check
-        run: ruff check src/
+        run: ruff check src/ tests/
