@@ -16,3 +16,4 @@ sentence-transformers
 faiss-cpu
 fastapi
 uvicorn
+pytest

@@ -51,3 +51,6 @@ evals/
 .idea/
 .vscode/
 *.swp
+
+# Other
+uv.lock
